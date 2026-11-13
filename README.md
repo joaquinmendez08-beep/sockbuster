@@ -11,8 +11,8 @@ Evaluación Sumativa 03 · Modelamiento de soluciones informáticas (TI3025) · 
 
 ## Autores
 
-- [NOMBRE COMPLETO DEL ESTUDIANTE 1]
-- [NOMBRE COMPLETO DEL ESTUDIANTE 2, si corresponde]
+- Alondra Ulloa Diaz
+- Joaquin Mendez Garcia
 
 ## Páginas
 
