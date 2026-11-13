@@ -5,9 +5,7 @@ Evaluación Sumativa 03 · Modelamiento de soluciones informáticas (TI3025) · 
 
 ## 🌐 Sitio web publicado
 
-**https://TU-USUARIO.github.io/sockbuster/**
-
-(Reemplaza `TU-USUARIO` por tu usuario de GitHub y el nombre del repositorio si es distinto.)
+**https://SOCKBUSTER.github.io/sockbuster/**
 
 ## Autores
 
