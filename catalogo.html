@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sockbuster | Catálogo</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><nav aria-label="Principal"><b>🧦 Sockbuster</b><a href="index.html">Inicio</a><a class="on" href="catalogo.html">Catálogo</a><a href="diagramas.html">Arquitectura UML</a></nav></header>
+<main>
+<h1>Catálogo por colecciones</h1>
+<div class="box" id="auth"></div>
+<p class="msg" id="msg" role="alert"></p>
+<div class="layout">
+<div><div id="cats" class="toc"></div><div id="grid" class="grid"></div></div>
+<aside><div class="box"><h2>Carrito</h2><div id="cart"></div></div><div class="box" id="order" aria-live="polite" hidden></div></aside>
+</div>
+<section class="box" id="admin" hidden><h2>Panel de administración</h2>
+<p class="mut">Registrar nuevo modelo</p>
+<input id="an" placeholder="Nombre"> <input id="ac" placeholder="Colección"> <input id="ao" placeholder="Película/serie"> <input id="ap" type="number" min="0" placeholder="Precio CLP"> <input id="as" type="number" min="0" placeholder="Stock"> <input id="at" placeholder="Tallas (S,M,L)"> <input id="ai" placeholder="Emoji" size="4"> <button class="btn" data-a="add2">Registrar modelo</button>
+<p class="mut">Actualizar precio y stock</p><div id="alist"></div></section>
+</main>
+<footer>Sockbuster Video &amp; Socks · Datos simulados guardados en tu navegador (localStorage)</footer>
+<script src="app.js"></script>
+</body></html>

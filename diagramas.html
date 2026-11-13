@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sockbuster | Arquitectura UML 4+1</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script></head>
+<body>
+<header><nav aria-label="Principal"><b>🧦 Sockbuster</b><a href="index.html">Inicio</a><a href="catalogo.html">Catálogo</a><a class="on" href="diagramas.html">Arquitectura UML</a></nav></header>
+<main>
+<h1>Arquitectura UML: Paradigma 4+1</h1>
+<p>Modelo de la plataforma Sockbuster organizado por las cinco vistas de Kruchten. Los diagramas están escritos en Mermaid y se renderizan en esta página.</p>
+<nav class="toc" aria-label="Vistas"><a class="chip" href="#req">Requerimientos</a><a class="chip" href="#logica">Vista Lógica</a><a class="chip" href="#desarrollo">Vista de Desarrollo</a><a class="chip" href="#procesos">Vista de Procesos</a><a class="chip" href="#fisica">Vista Física</a><a class="chip" href="#escenarios">Escenarios</a></nav>
+
+<section id="req"><h2>Requerimientos y trazabilidad</h2>
+<div class="tw"><table><tr><th>Requerimiento</th><th>En la web</th><th>Lógica</th><th>Desarrollo</th><th>Procesos</th><th>Física</th><th>Escenario</th></tr>
+<tr><td><b>RF01</b> Catálogo por colecciones</td><td>catalogo.html (filtros, foto, precio, stock, tallas)</td><td>Coleccion, Calcetin</td><td>Módulo Catálogo</td><td>Filtrado</td><td>CDN/Web</td><td>E1</td></tr>
+<tr><td><b>RF02</b> Carrito y pedidos</td><td>Carrito y checkout con ID único</td><td>Carrito, ItemCarrito, Pedido</td><td>Módulo Carrito</td><td>Checkout</td><td>Navegador</td><td>E2</td></tr>
+<tr><td><b>RF03</b> Administración de inventario</td><td>Panel de administración</td><td>Administrador, Calcetin</td><td>Módulo Admin</td><td>Autenticación</td><td>API futura</td><td>E3</td></tr>
+<tr><td><b>RF04</b> Reseñas de fanáticos</td><td>Reseñas de 1 a 5 estrellas</td><td>Resena, Cliente</td><td>Módulo Reseñas</td><td>Autenticación</td><td>Navegador</td><td>E4</td></tr>
+<tr><td><b>RNF01</b> Disponibilidad y despliegue en la nube</td><td>Sitio estático en GitHub Pages, sin dependencias pesadas</td><td>–</td><td>Repositorio</td><td>–</td><td>CDN, Servidor Web</td><td>E1</td></tr>
+<tr><td><b>RNF02</b> Seguridad HTTPS y JWT</td><td>Sesión con token JWT simulado; solo admin gestiona inventario</td><td>Usuario.login()</td><td>Módulo Admin</td><td>Autenticación</td><td>HTTPS 443, API + JWT</td><td>E3</td></tr></table></div>
+<p class="mut">Nota: este prototipo no tiene servidor propio. Los datos viven en el navegador (localStorage) y el JWT se genera en el cliente de forma simulada; la vista física muestra la evolución hacia una API REST real.</p></section>
+
+<section id="logica"><h2>Vista Lógica</h2>
+<p>Diagrama de clases del dominio: usuarios con herencia (Cliente, Administrador), colecciones, calcetines, reseñas, carrito y pedidos, con atributos, métodos y multiplicidades.</p>
+<div class="dg"><pre class="mermaid">
+classDiagram
+class Usuario{
++int id
++String nombre
++String email
++String rol
++login() Token
+}
+class Cliente
+class Administrador{
++registrarModelo() Calcetin
++actualizarStock(id, cantidad)
++modificarPrecio(id, precio)
+}
+class Coleccion{
++String nombre
++String obra
+}
+class Calcetin{
++int id
++String nombre
++float precio
++int stock
++List~String~ tallas
+}
+class Resena{
++int estrellas
++String comentario
++Date fecha
+}
+class Carrito{
++agregar(Calcetin, talla)
++cambiarCantidad(id, n)
++total() float
+}
+class ItemCarrito{
++int cantidad
++String talla
+}
+class Pedido{
++String idPedido
++Date fecha
++float total
++generarResumen() String
+}
+Usuario <|-- Cliente
+Usuario <|-- Administrador
+Coleccion "1" o-- "1..*" Calcetin : agrupa
+Cliente "1" --> "0..*" Resena : publica
+Calcetin "1" --> "0..*" Resena : recibe
+Cliente "1" --> "1" Carrito : posee
+Carrito "1" *-- "0..*" ItemCarrito : contiene
+ItemCarrito "*" --> "1" Calcetin : referencia
+Carrito "1" --> "0..1" Pedido : checkout genera
+Cliente "1" --> "0..*" Pedido : realiza
+Administrador ..> Calcetin : gestiona
+</pre></div></section>
+
+<section id="desarrollo"><h2>Vista de Desarrollo</h2>
+<p>Organización del código en el repositorio: capa de presentación (HTML y CSS), capa lógica (módulos de app.js) y capa de datos (localStorage), más la librería Mermaid para renderizar esta página.</p>
+<div class="dg"><pre class="mermaid">
+flowchart TB
+subgraph Repo["Repositorio GitHub: sockbuster"]
+subgraph Pres["Capa de presentación"]
+I["index.html"]
+C["catalogo.html"]
+D["diagramas.html"]
+S["style.css"]
+end
+subgraph Log["Capa lógica: app.js"]
+P["Módulo Catálogo y filtros"]
+K["Módulo Carrito y Checkout"]
+A["Módulo Admin y Auth JWT"]
+R["Módulo Reseñas"]
+end
+subgraph Dat["Capa de datos"]
+LS[("localStorage")]
+end
+RM["README.md"]
+end
+subgraph Lib["Librerías externas"]
+MM["Mermaid.js"]
+GF["Google Fonts"]
+end
+C --> P
+C --> K
+C --> A
+C --> R
+P --> LS
+K --> LS
+A --> LS
+R --> LS
+D --> MM
+I --> S
+C --> S
+D --> S
+S --> GF
+</pre></div></section>
+
+<section id="procesos"><h2>Vista de Procesos</h2>
+<p>Checkout (RF02): valida carrito y stock; luego descuenta stock y genera el pedido en paralelo, y recién entonces confirma al cliente (sincronización).</p>
+<div class="dg"><pre class="mermaid">
+sequenceDiagram
+actor C as Cliente
+participant UI as catalogo.html
+participant JS as app.js
+participant LS as localStorage
+C->>UI: Pulsa Pagar
+UI->>JS: pay()
+JS->>JS: Validar carrito y stock
+alt Carrito vacío o sin stock
+JS-->>UI: Mensaje de error
+else Datos válidos
+par Descontar stock
+JS->>LS: Guardar inventario
+and Generar pedido
+JS->>JS: Crear ID único y resumen
+end
+JS->>LS: Guardar pedido
+JS-->>UI: Mostrar resumen con ID
+UI-->>C: Pedido confirmado
+end
+</pre></div>
+<p>Filtrado del catálogo (RF01):</p>
+<div class="dg"><pre class="mermaid">
+flowchart TD
+A([Inicio]) --> B["Cliente elige una colección"]
+B --> C{"¿Colección = Todas?"}
+C -- Sí --> D["Tomar todo el catálogo"]
+C -- No --> E["Filtrar por colección"]
+D --> F["Mostrar tarjetas: foto, precio, stock, tallas"]
+E --> F
+F --> G([Fin])
+</pre></div>
+<p>Autenticación y gestión de inventario (RF03, RF04, RNF02):</p>
+<div class="dg"><pre class="mermaid">
+sequenceDiagram
+actor U as Usuario
+participant JS as app.js
+participant LS as localStorage
+U->>JS: Ingresa usuario y clave
+JS->>JS: Verificar credenciales
+alt Inválidas
+JS-->>U: Error de acceso
+else Válidas
+JS->>LS: Guardar token JWT con rol y expiración
+JS-->>U: Sesión iniciada
+end
+U->>JS: Solicita acción protegida
+JS->>LS: Leer token y validar exp y rol
+alt Rol admin
+JS-->>U: Permite editar inventario
+else Rol cliente
+JS-->>U: Permite solo reseñas
+end
+</pre></div></section>
+
+<section id="fisica"><h2>Vista Física</h2>
+<p>Topología de despliegue: el navegador del cliente accede por HTTPS al CDN de GitHub Pages que sirve el sitio estático (RNF01 y RNF02). En línea punteada, la evolución escalable con API REST protegida por JWT y base de datos.</p>
+<div class="dg"><pre class="mermaid">
+flowchart LR
+subgraph Cliente["Dispositivo del cliente"]
+B["Navegador web<br/>HTML + CSS + JS"]
+LS[("localStorage")]
+end
+subgraph Nube["Nube: GitHub Pages"]
+CDN["CDN"]
+W["Servidor web estático<br/>repositorio sockbuster"]
+end
+subgraph Ext["CDN externo"]
+M["jsDelivr: Mermaid.js"]
+end
+subgraph Futuro["Evolución escalable"]
+API["API REST + JWT"]
+DB[("Base de datos")]
+end
+B -- "HTTPS 443" --> CDN
+CDN --> W
+B -- "HTTPS" --> M
+B --- LS
+B -. "HTTPS + JWT" .-> API
+API --> DB
+</pre></div></section>
+
+<section id="escenarios"><h2>Escenarios (5ª vista)</h2>
+<p>Casos de uso que articulan las cuatro vistas anteriores.</p>
+<div class="dg"><pre class="mermaid">
+flowchart LR
+V(["Visitante"]) --> UC1(("Explorar y filtrar catálogo"))
+CL(["Cliente registrado"]) --> UC1
+CL --> UC2(("Gestionar carrito y checkout"))
+CL --> UC3(("Publicar reseña"))
+AD(["Administrador"]) --> UC4(("Gestionar inventario y temáticas"))
+UC3 -. include .-> UC5(("Autenticar con JWT"))
+UC4 -. include .-> UC5
+</pre></div>
+<div class="tw"><table><tr><th>Escenario</th><th>Historia de usuario</th><th>Vista Lógica</th><th>Vista de Desarrollo</th><th>Vista de Procesos</th><th>Vista Física</th></tr>
+<tr><td><b>E1</b> Explorar</td><td>Como visitante quiero filtrar por colección para encontrar calcetines de mi película favorita.</td><td>Coleccion, Calcetin</td><td>Módulo Catálogo</td><td>Diagrama de filtrado</td><td>Navegador → CDN → Servidor web</td></tr>
+<tr><td><b>E2</b> Comprar</td><td>Como cliente quiero pagar mi carrito y recibir un identificador de pedido.</td><td>Carrito, ItemCarrito, Pedido</td><td>Módulo Carrito</td><td>Secuencia de checkout</td><td>Navegador y localStorage</td></tr>
+<tr><td><b>E3</b> Administrar</td><td>Como administrador quiero actualizar stock y precios con una sesión segura.</td><td>Administrador, Calcetin</td><td>Módulo Admin y Auth</td><td>Secuencia de autenticación</td><td>HTTPS + JWT hacia API futura</td></tr>
+<tr><td><b>E4</b> Opinar</td><td>Como cliente registrado quiero valorar un producto de 1 a 5 estrellas.</td><td>Resena, Cliente</td><td>Módulo Reseñas</td><td>Secuencia de autenticación</td><td>Navegador y localStorage</td></tr></table></div></section>
+</main>
+<footer>Sockbuster Video &amp; Socks · Documentación técnica 4+1</footer>
+<script>mermaid.initialize({startOnLoad:true,theme:'neutral',securityLevel:'loose'});</script>
+</body></html>
